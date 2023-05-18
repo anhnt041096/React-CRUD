@@ -1,16 +1,30 @@
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
+import { postCreateUser } from "../services/userService";
+import { toast } from "react-toastify";
 
-const ModalAddNew = ({ handleClose = () => {}, show }) => {
-    
-    const [name, setName] = useState("");
-    const [job, setJob] = useState("");
-    
-    const handleSaveUser = () => {
+const ModalAddNew = ({
+  handleClose = () => {},
+  handleUpdateTable = () => {},
+  show,
+}) => {
+  const [name, setName] = useState("");
+  const [job, setJob] = useState("");
 
+  const handleSaveUser = async () => {
+    let res = await postCreateUser(name, job);
+    if (res && res.id) {
+      handleClose();
+      setName("");
+      setJob("");
+      toast.success("A User is created succed!");
+      handleUpdateTable({ first_name: name, id: res.id });
+    } else {
+      toast.error("An error...");
     }
+  };
 
-    return (
+  return (
     <>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -19,20 +33,20 @@ const ModalAddNew = ({ handleClose = () => {}, show }) => {
         <Modal.Body>
           <div className="body-add-new">
             <form>
-              <div class="mb-3">
-                <label class="form-label">Name</label>
+              <div className="mb-3">
+                <label className="form-label">Name</label>
                 <input
                   type="text"
-                  class="form-control"
+                  className="form-control"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              <div class="mb-3">
-                <label class="form-label">Job</label>
+              <div className="mb-3">
+                <label className="form-label">Job</label>
                 <input
                   type="text"
-                  class="form-control"
+                  className="form-control"
                   value={job}
                   onChange={(e) => setJob(e.target.value)}
                 />
@@ -44,7 +58,7 @@ const ModalAddNew = ({ handleClose = () => {}, show }) => {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={() => handleSaveUser}>
+          <Button variant="primary" onClick={handleSaveUser}>
             Save Changes
           </Button>
         </Modal.Footer>
